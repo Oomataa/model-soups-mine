@@ -129,3 +129,9 @@ dmypy.json
 .pyre/
 .vscode
 .idea*.tmp
+*.tmp
+logs/
+lightning_logs/
+*.ckpt
+*.pt
+*.pth

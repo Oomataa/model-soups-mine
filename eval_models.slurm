@@ -55,7 +55,7 @@ DATA_DIR="$SLURM_TMPDIR"
 MODEL_DIR="/scratch/omata/model-soups-models"
 
 #Move into your project directory
-cd ~/links/scratch/model-soups
+cd ~/links/scratch/model-soups-mine
 python test.py
 # Run your command
 python main.py \

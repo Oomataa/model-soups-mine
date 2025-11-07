@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=bootsoups
 #SBATCH --account=rrg-ebrahimi
-#SBATCH --array=0-71                      
+#SBATCH --array=0-71                     
 #SBATCH --time=8:00:00
 #SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=8
@@ -44,7 +44,7 @@ DATA="$SLURM_TMPDIR"
 EPOCHS=8
 BATCH=256
 
-cd ~/links/scratch/model-soups
+cd ~/links/scratch/model-soups-mine
 
 # NEW: separate location for bootstrap checkpoints
 CKPT_ROOT=/scratch/omata/model-soups-bootstraps
@@ -59,7 +59,9 @@ python finetune.py \
   --model-location "$CKPT_DIR" \
   --name "$NAME" \
   --bootstrap \
-  --bootstrap-seed $SEED 
+  --bootstrap-seed $SEED \
+  --save-last-only
+
 
 echo "[INFO] Evaluation job finished at $(date)"
 

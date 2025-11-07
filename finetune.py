@@ -74,6 +74,12 @@ def parse_arguments():
     parser.add_argument(
         "--timm-aug", action="store_true", default=False,
     )
+    parser.add_argument(
+        "--save-last-only", action="store_true", default=False,
+        help="Save only the final epoch as last.pt"
+    )
+
+
     parser.add_argument("--bootstrap", action="store_true", default=False,
                     help="Use bootstrap sampling (WITH replacement) for the training loader.")
     parser.add_argument("--bootstrap-seed", type=int, default=0,
@@ -87,6 +93,13 @@ def parse_arguments():
 if __name__ == '__main__':
     args = parse_arguments()
     DEVICE = 'cuda'
+
+
+        # --- Keep only best + last checkpoints ---
+    os.makedirs(args.model_location, exist_ok=True)
+    best_top1 = float('-inf')
+    best_path = os.path.join(args.model_location, 'best.pt')
+
 
     if args.custom_template:
         template = [lambda x : f"a photo of a {x}."]
@@ -224,9 +237,25 @@ if __name__ == '__main__':
                 pbar.set_description(
                     f"Val loss: {loss.item():.4f}   Acc: {100*correct/count:.2f}")
             top1 = correct / count
-        print(f'Val acc at epoch {epoch}: {100*top1:.2f}')
 
-        model_path = os.path.join(args.model_location, f'{args.name}_{epoch + 1}.pt')
-        print('Saving model to', model_path)
-        torch.save(model.module.state_dict(), model_path)
+
+
+        epoch_idx = epoch + 1
+        print(f'Val acc at epoch {epoch_idx}: {100*top1:.2f}')
+
+        if args.save_last_only and epoch_idx != args.epochs:
+            # Skip saving intermediate epochs
+            continue
+
+        last_path = os.path.join(args.model_location, 'last.pt' if args.save_last_only else f'{args.name}_{epoch_idx}.pt')
+        torch.save(model.module.state_dict(), last_path)
+        print(f'[INFO] Saved checkpoint -> {last_path}')
+
+
+
+       # print(f'Val acc at epoch {epoch}: {100*top1:.2f}')
+
+       # model_path = os.path.join(args.model_location, f'{args.name}_{epoch + 1}.pt')
+       # print('Saving model to', model_path)
+       # torch.save(model.module.state_dict(), model_path)
 
